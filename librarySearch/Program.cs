@@ -62,13 +62,45 @@ namespace librarySearch
         static void quickSort(string[] books, int left, int right)
         {
             if (left >= right) return;
-            int baseElement = books[(left + right) / 2][4]; // Choose first letter in surname.
+            int letterOfSurname = 4;
+            string baseAuthor = books[(left + right) / 2]; // Choose middle author from array.
+            int baseElement = baseAuthor[letterOfSurname]; // Choose first letter in surname.
             int i = left;
             int j = right;
             while (i <= j)
             {
-                while (books[i][4] < baseElement) i++;
-                while (books[j][4] > baseElement) j--;
+                while (books[i][letterOfSurname] <= baseElement)
+                {
+                    if (books[i] == baseAuthor) break;
+                    while (books[i][letterOfSurname] == baseElement)
+                    {
+                        baseElement = baseAuthor[++letterOfSurname];
+                        if (letterOfSurname == books[i].Length - 1 || letterOfSurname == baseAuthor.Length - 1)
+                        {
+                            break;
+                        }
+                    }
+                    if (books[i][letterOfSurname] < baseElement) i++;
+                    else break;
+                }
+                letterOfSurname = 4;
+                baseElement = baseAuthor[letterOfSurname];
+                while (books[j][letterOfSurname] >= baseElement)
+                {
+                    if (books[j] == baseAuthor) break;
+                    while (books[j][letterOfSurname] == baseElement)
+                    {
+                        baseElement = baseAuthor[++letterOfSurname];
+                        if (letterOfSurname == books[j].Length - 1 || letterOfSurname == baseAuthor.Length - 1)
+                        {
+                            break;
+                        }
+                    }
+                    if (books[j][letterOfSurname] > baseElement) j--;
+                    else break;
+                }
+                letterOfSurname = 4;
+                baseElement = baseAuthor[letterOfSurname];
                 if (i <= j)
                 {
                     string tempBook = books[i];
