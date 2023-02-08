@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,12 +54,64 @@ namespace librarySearch
 
                 columnIterator = 0;
                 Console.SetCursorPosition(0, 0);
-                Console.Write("Библиотека\n\nВведите команду:\n\n1 - Поиск книги по автору\n\n2 - Поиск книги по стелажу\n\n3 - Добавление книги\n\nВвод команды:");
-                //quickSort(books, 0, books.Length - 1);
+                Console.Write("Библиотека\n\nВведите команду:\n\n1 - Поиск книги по автору\n\n2 - Поиск книги по стелажу\n\n3 - Добавление книги\n\n4 - Выход из программы\n\nВвод команды:");
+                userInput = Console.ReadLine();
+                switch (userInput)
+                {
+                    case "1":
+                        Console.Write("Введите имя автора (Формат И.О.Фамилия): ");
+                        userInput = Console.ReadLine();
+                        if (checkFormatName(userInput))
+                        {
+                            findBookByAuthor(books, userInput);
+                        } 
+                        else
+                        {
+                            Console.Write("Неправильный формат ввода имени.\nНажмите любую клавишу для продолжения...");
+                        }
+                        break;
+                    case "2":
+                        Console.Write("Введите первую позицую полки (от 1 до 5): ");
+                        userInput = Console.ReadLine();
+                        int posY = Convert.ToInt32(userInput);
+
+                        Console.Write("\nВведите позицую книги на полке (от 1 до 4): ");
+                        userInput = Console.ReadLine();
+                        int posX = Convert.ToInt32(userInput);
+
+                        if (1 <= posY && posY <= 5 && 1 <= posX && posX <= 4)
+                        {
+                            findBookByPosition(books, posY, posX);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ошибка! Неверна выбрана позиция книги!\nНажмите любую клавшиу для продолжения...");
+                        }
+                        break;
+                    case "3":
+                        Console.Write("Введите имя автора книги (Формат И.О.Фамилия): ");
+                        userInput = Console.ReadLine();
+                        if (checkFormatName(userInput))
+                        {
+                            setBook(books, userInput);
+                        }
+                        else
+                        {
+                            Console.Write("Неправильный формат ввода имени.\nНажмите любую клавишу для продолжения...");
+                        }
+                        break;
+                    case "4":
+                        isOpen = false;
+                        break;
+                    default:
+                        Console.WriteLine("Неверная команда.\nНажмите любую клавишу для продолжения...");
+                        break;
+                }
                 Console.ReadKey();
                 Console.Clear();
             }
         }
+
         static void quickSort(string[] books, int left, int right)
         {
             if (left >= right) return;
@@ -112,6 +165,80 @@ namespace librarySearch
             }
             quickSort(books, left, j);
             quickSort(books, i, right);
+        }
+
+        static void setBook(string[,] books, string book)
+        {
+            int lengthOfColumns = books.GetUpperBound(0);
+            int lengthOfRows = books.Length / lengthOfColumns;
+            const string emptyShelf = "Пустая полка";
+            for (int i = 0; i < lengthOfRows; ++i)
+            {
+                for (int j = 0; j < lengthOfColumns; ++j)
+                {
+                    if (books[i, j] == emptyShelf)
+                    {
+                        books[i, j] = book;
+                        Console.WriteLine($"Книга автора {book} поставлена на позиции {i + 1}, {j + 1}");
+                        return;
+                    }
+                }
+            }
+            Console.WriteLine("Не найдено пустой полки.");
+        }
+
+        static void findBookByAuthor(string[,] books, string author)
+        {
+            int lengthOfColumns = books.GetUpperBound(0);
+            int lengthOfRows = books.Length / lengthOfColumns;
+            for (int i = 0; i < lengthOfRows; ++i)
+            {
+                for (int j = 0; j < lengthOfColumns; ++j) 
+                {
+                    if (books[i,j] == author)
+                    {
+                        Console.WriteLine($"Книга автора {author} находится на позиции {i + 1}, {j + 1}");
+                        return;
+                    }
+                }
+            }
+            Console.WriteLine($"Книга автора {author} не найдена.");
+        }
+
+        static bool checkFormatName(string author)
+        {
+            const int letterInName = 5;
+            const int letterOfSurname = 4;
+            const string formatName = "N.P.S"; // N - name, P - patronymic, S - surname
+
+            bool isRight = false;
+            if (author.Length >= letterInName)
+            {
+                isRight = true;
+                for (int i = 0; i < letterOfSurname; ++i)
+                {
+                    if (char.IsLetter(author[i]) && char.IsLetter(formatName[i]))
+                    {
+                        continue;
+                    } 
+                    else if (author[i] == '.' && formatName[i] == '.')
+                    {
+                        continue;
+                    } 
+                    else
+                    {
+                        isRight = false;
+                        break;
+                    }
+                }
+            }
+
+            return isRight;
+        }
+
+        static void findBookByPosition(string[,] books, int posY, int posX)
+        {
+            Console.WriteLine($"На позиции {posY}, {posX} находится книга автора {books[posY - 1, posX - 1]}");
         }
     }
 }
